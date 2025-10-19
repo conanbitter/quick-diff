@@ -17,20 +17,71 @@
             background-color: rgb(226, 147, 147);
             color: rgb(146, 0, 0);
         }
+
+        .container {
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Quick Diff</h1>
-    <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed quam faucibus, posuere tortor ac, pellentesque
-        elit. Aenean ac neque tellus. Integer nulla justo, blandit eget augue a, vulputate congue mauris. Proin sit amet
-        diam <span class="range add">quis</span> odio <span class="range add">dignissim</span> vestibulum. Donec et
-        convallis purus. Suspendisse laoreet nibh felis, sed pretium quam malesuada ut. Fusce commodo at tortor eu
-        faucibus. <span class="range del">Mauris sed porta turpis.</span> Pellentesque mauris dui, commodo eu purus
-        eleifend, dapibus blandit ex. Nullam fringilla, eros eget rutrum finibus, urna dui elementum ante, a vestibulum
-        mi mauris et risus.
-    </p>
+    <div class="container">
+        <h1>Quick Diff</h1>
+        <p id="text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed quam faucibus, posuere tortor ac,
+            pellentesque
+            elit. Aenean ac neque tellus. Integer nulla justo, blandit eget augue a, vulputate congue mauris. Proin sit
+            amet
+            diam <span class="range add">quis</span> odio <span class="range add">dignissim</span> vestibulum. Donec et
+            convallis purus. Suspendisse laoreet nibh felis, sed pretium quam malesuada ut. Fusce commodo at tortor eu
+            faucibus. <span class="range del">Mauris sed porta turpis.</span> Pellentesque mauris dui, commodo eu purus
+            eleifend, dapibus blandit ex. Nullam fringilla, eros eget rutrum finibus, <span class="range add">urna
+                dui</span> elementum ante, a vestibulum
+            mi mauris et risus.
+        </p>
+    </div>
+    <script>
+        const paragraph = document.getElementById('text');
+        const spans = paragraph.querySelectorAll('.add');
+
+        // create a container for highlight overlays
+        const highlightContainer = document.createElement('div');
+        highlightContainer.style.position = 'absolute';
+        highlightContainer.style.top = '0';
+        highlightContainer.style.left = '0';
+        highlightContainer.style.width = '100%';
+        highlightContainer.style.pointerEvents = 'none';
+        highlightContainer.style.zIndex = '0'; // behind text
+        paragraph.style.position = 'relative';
+        paragraph.prepend(highlightContainer);
+
+        const rectsByLine = new Map();
+
+        spans.forEach(span => {
+            const rects = span.getClientRects();
+            for (const rect of rects) {
+                // Round top value to group lines
+                const lineTop = Math.round(rect.top);
+                if (!rectsByLine.has(lineTop)) {
+                    rectsByLine.set(lineTop, rect);
+                }
+            }
+        });
+
+        for (const rect of rectsByLine.values()) {
+            const highlight = document.createElement('div');
+            highlight.style.position = 'absolute';
+            highlight.style.left = `${rect.left - paragraph.getBoundingClientRect().left}px`;
+            highlight.style.top = `${rect.top - paragraph.getBoundingClientRect().top}px`;
+            highlight.style.width = `${rect.width}px`;
+            highlight.style.height = `${rect.height}px`;
+            highlight.style.background = 'rgba(255, 255, 0, 0.3)';
+            highlight.style.borderRadius = '3px';
+            highlightContainer.appendChild(highlight);
+        }
+    </script>
 </body>
 
 </html>
