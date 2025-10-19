@@ -4,18 +4,21 @@
 <head>
     <style>
         .range {
-            border-radius: 0.2em;
+            border-radius: 0.3em;
             padding: 0.2rlh;
+            /*border: solid 1px;*/
         }
 
         .add {
-            background-color: rgb(174, 204, 121);
-            color: rgb(80, 122, 0);
+            background-color: rgb(165, 214, 167);
+            color: rgb(27, 94, 32);
+            border-color: rgb(129, 199, 132);
         }
 
         .del {
-            background-color: rgb(226, 147, 147);
-            color: rgb(146, 0, 0);
+            background-color: rgb(239, 154, 154);
+            color: rgb(183, 28, 28);
+            border-color: rgb(229, 115, 115);
         }
 
         .container {
@@ -32,22 +35,22 @@
 
         .highlight {
             position: absolute;
-            border-left: solid 2px;
+            border-left: solid 4px;
         }
 
         .line-add {
-            background-color: rgb(128, 255, 128);
-            border-color: rgb(0, 128, 0);
+            background-color: rgb(200, 230, 201);
+            border-color: rgb(46, 125, 50);
         }
 
         .line-del {
-            background-color: rgb(255, 128, 128);
-            border-color: rgb(128, 0, 0);
+            background-color: rgb(255, 205, 210);
+            border-color: rgb(198, 40, 40);
         }
 
         .line-mixed {
-            background-color: rgb(255, 255, 128);
-            border-color: rgb(128, 128, 0);
+            background-color: rgb(255, 249, 196);
+            border-color: rgb(249, 168, 37);
         }
     </style>
 </head>
@@ -121,9 +124,9 @@
 
             const highlight = document.createElement('div');
             highlight.className = 'highlight ' + color;
-            highlight.style.left = `-3px`;
+            highlight.style.left = `-8px`;
             highlight.style.top = `${rect.top - container.getBoundingClientRect().top}px`;
-            highlight.style.width = `${container.getBoundingClientRect().width + 3}px`;
+            highlight.style.width = `${container.getBoundingClientRect().width + 4}px`;
             highlight.style.height = `${rect.height}px`;
 
             highlightContainer.appendChild(highlight);
