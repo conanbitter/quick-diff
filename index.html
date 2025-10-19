@@ -29,6 +29,26 @@
             position: relative;
             line-height: 1.5;
         }
+
+        .highlight {
+            position: absolute;
+            border-left: solid 2px;
+        }
+
+        .line-add {
+            background-color: rgb(128, 255, 128);
+            border-color: rgb(0, 128, 0);
+        }
+
+        .line-del {
+            background-color: rgb(255, 128, 128);
+            border-color: rgb(128, 0, 0);
+        }
+
+        .line-mixed {
+            background-color: rgb(255, 255, 128);
+            border-color: rgb(128, 128, 0);
+        }
     </style>
 </head>
 
@@ -92,21 +112,20 @@
         });
 
         for (const { rect, kind } of rectsByLine.values()) {
-            let color = 'rgba(255, 255, 0, 0.3)';
+            let color = 'line-mixed';
             if (kind === "add") {
-                color = 'rgba(0, 255, 0, 0.2)';
+                color = 'line-add';
             } else if (kind === "del") {
-                color = 'rgba(255, 0, 0, 0.2)';
+                color = 'line-del';
             }
 
             const highlight = document.createElement('div');
-            highlight.style.position = 'absolute';
-            highlight.style.left = `$0px`;
+            highlight.className = 'highlight ' + color;
+            highlight.style.left = `-3px`;
             highlight.style.top = `${rect.top - container.getBoundingClientRect().top}px`;
-            highlight.style.width = `${container.getBoundingClientRect().width}px`;
+            highlight.style.width = `${container.getBoundingClientRect().width + 3}px`;
             highlight.style.height = `${rect.height}px`;
-            highlight.style.background = color;
-            highlight.style.borderRadius = '3px';
+
             highlightContainer.appendChild(highlight);
         }
     </script>
