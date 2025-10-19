@@ -3,6 +3,11 @@
 
 <head>
     <style>
+        body {
+            background-color: rgb(239, 242, 255);
+            padding: 0;
+        }
+
         .range {
             border-radius: 0.3em;
             padding: 0.2rlh;
@@ -52,12 +57,38 @@
             background-color: rgb(255, 249, 196);
             border-color: rgb(249, 168, 37);
         }
+
+        .sources-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .source {
+            flex: 1;
+            border: 1px solid rgb(200, 203, 233);
+            margin: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            resize: none;
+            height: 20rem;
+        }
+
+        .source:focus {
+            border: 2px solid rgb(120, 124, 170);
+            margin: 4px;
+            outline: none;
+        }
     </style>
 </head>
 
 <body>
+    <h1>Quick Diff</h1>
+    <div class="sources-container">
+        <textarea class="source" placeholder="Before"></textarea>
+        <textarea class="source" placeholder="After"></textarea>
+    </div>
     <div class="container" id="container">
-        <h1>Quick Diff</h1>
+
         <p id="text">
             Lorem <span class="range del">ipsum</span> dolor sit amet, <span class="range add">consectetur</span>
             adipiscing elit. In sed quam faucibus, posuere tortor ac,
