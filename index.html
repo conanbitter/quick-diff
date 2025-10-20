@@ -78,14 +78,33 @@
             margin: 4px;
             outline: none;
         }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .button-container button {
+            font-size: 200%;
+            background-color: rgb(43, 136, 43);
+            padding: 5px 15px;
+            border-radius: 10px;
+            border: darkslategray solid 2px;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
+    <script src="diff.js"></script>
+    <script src="purify.js"></script>
     <h1>Quick Diff</h1>
     <div class="sources-container">
-        <textarea class="source" placeholder="Before"></textarea>
-        <textarea class="source" placeholder="After"></textarea>
+        <textarea class="source" placeholder="Before" id="comp1"></textarea>
+        <textarea class="source" placeholder="After" id="comp2"></textarea>
+    </div>
+    <div class="button-container">
+        <button id="tocompare">Compare</button>
     </div>
     <div class="container" id="container">
 
@@ -105,63 +124,97 @@
     </div>
     <script>
         const container = document.getElementById('container');
-        const spans_add = container.querySelectorAll('.add');
-        const spans_del = container.querySelectorAll('.del');
+        const textareaBefore = document.getElementById('comp1');
+        const textareaAfter = document.getElementById('comp2');
+        function highlight_lines() {
+            const spans_add = container.querySelectorAll('.add');
+            const spans_del = container.querySelectorAll('.del');
 
-        // create a container for highlight overlays
-        const highlightContainer = document.createElement('div');
-        highlightContainer.style.position = 'absolute';
-        highlightContainer.style.top = '0';
-        highlightContainer.style.left = '0';
-        highlightContainer.style.width = '100%';
-        highlightContainer.style.pointerEvents = 'none';
-        highlightContainer.style.zIndex = '0'; // behind text
-        container.style.position = 'relative';
-        container.prepend(highlightContainer);
+            // create a container for highlight overlays
+            const highlightContainer = document.createElement('div');
+            highlightContainer.style.position = 'absolute';
+            highlightContainer.style.top = '0';
+            highlightContainer.style.left = '0';
+            highlightContainer.style.width = '100%';
+            highlightContainer.style.pointerEvents = 'none';
+            highlightContainer.style.zIndex = '0'; // behind text
+            container.style.position = 'relative';
+            container.prepend(highlightContainer);
 
-        const rectsByLine = new Map();
+            const rectsByLine = new Map();
 
-        spans_add.forEach(span => {
-            const rects = span.getClientRects();
-            for (const rect of rects) {
-                // Round top value to group lines
-                const lineTop = Math.round(rect.top);
-                if (!rectsByLine.has(lineTop)) {
-                    rectsByLine.set(lineTop, { rect, kind: "add" });
+            spans_add.forEach(span => {
+                const rects = span.getClientRects();
+                for (const rect of rects) {
+                    // Round top value to group lines
+                    const lineTop = Math.round(rect.top);
+                    if (!rectsByLine.has(lineTop)) {
+                        rectsByLine.set(lineTop, { rect, kind: "add" });
+                    }
                 }
-            }
-        });
+            });
 
-        spans_del.forEach(span => {
-            const rects = span.getClientRects();
-            for (const rect of rects) {
-                // Round top value to group lines
-                const lineTop = Math.round(rect.top);
-                if (!rectsByLine.has(lineTop)) {
-                    rectsByLine.set(lineTop, { rect, kind: "del" });
-                } else if (rectsByLine.get(lineTop).kind === "add") {
-                    rectsByLine.set(lineTop, { rect, kind: "mix" });
+            spans_del.forEach(span => {
+                const rects = span.getClientRects();
+                for (const rect of rects) {
+                    // Round top value to group lines
+                    const lineTop = Math.round(rect.top);
+                    if (!rectsByLine.has(lineTop)) {
+                        rectsByLine.set(lineTop, { rect, kind: "del" });
+                    } else if (rectsByLine.get(lineTop).kind === "add") {
+                        rectsByLine.set(lineTop, { rect, kind: "mix" });
+                    }
                 }
+            });
+
+            for (const { rect, kind } of rectsByLine.values()) {
+                let color = 'line-mixed';
+                if (kind === "add") {
+                    color = 'line-add';
+                } else if (kind === "del") {
+                    color = 'line-del';
+                }
+
+                const highlight = document.createElement('div');
+                highlight.className = 'highlight ' + color;
+                highlight.style.left = `-8px`;
+                highlight.style.top = `${rect.top - container.getBoundingClientRect().top}px`;
+                highlight.style.width = `${container.getBoundingClientRect().width + 4}px`;
+                highlight.style.height = `${rect.height}px`;
+
+                highlightContainer.appendChild(highlight);
             }
-        });
-
-        for (const { rect, kind } of rectsByLine.values()) {
-            let color = 'line-mixed';
-            if (kind === "add") {
-                color = 'line-add';
-            } else if (kind === "del") {
-                color = 'line-del';
-            }
-
-            const highlight = document.createElement('div');
-            highlight.className = 'highlight ' + color;
-            highlight.style.left = `-8px`;
-            highlight.style.top = `${rect.top - container.getBoundingClientRect().top}px`;
-            highlight.style.width = `${container.getBoundingClientRect().width + 4}px`;
-            highlight.style.height = `${rect.height}px`;
-
-            highlightContainer.appendChild(highlight);
         }
+        function escapeHTML(str) {
+            return str.replace(/[&<>"'\/]/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;'
+            })[ch]);
+        }
+
+
+        const btnCompare = document.getElementById("tocompare");
+        btnCompare.addEventListener("click", function () {
+            const beforeText = textareaBefore.value;
+            const afterText = textareaAfter.value;
+            const diffs = Diff.diffChars(beforeText, afterText);
+            let elements = [];
+            for (const diff of diffs) {
+                const value = escapeHTML(diff.value);
+                if (diff.added) {
+                    elements.push(`<span class="range add">${value}</span>`);
+                } else if (diff.removed) {
+                    elements.push(`<span class="range del">${value}</span>`);
+                } else {
+                    elements.push(value);
+                }
+            }
+
+            const resultText = "<p>" + elements.join("").replace("\n", "</p><p>") + "</p>";
+
+            container.setHTMLUnsafe(resultText);
+            highlight_lines();
+            //console.log(resultText);
+        });
     </script>
 </body>
 
