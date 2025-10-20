@@ -30,6 +30,10 @@
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
+            background-color: white;
+            border: 1px solid rgb(200, 203, 233);
+            padding: 10px;
+            border-radius: 5px;
         }
 
         .container p {
@@ -82,6 +86,7 @@
         .button-container {
             display: flex;
             justify-content: center;
+            margin-bottom: 10px;
         }
 
         .button-container button {
@@ -126,6 +131,9 @@
         const container = document.getElementById('container');
         const textareaBefore = document.getElementById('comp1');
         const textareaAfter = document.getElementById('comp2');
+        const segmenter = new Intl.Segmenter("ru", { granularity: "word" });
+
+
         function highlight_lines() {
             const spans_add = container.querySelectorAll('.add');
             const spans_del = container.querySelectorAll('.del');
@@ -169,17 +177,17 @@
 
             for (const { rect, kind } of rectsByLine.values()) {
                 let color = 'line-mixed';
-                if (kind === "add") {
+                /*if (kind === "add") {
                     color = 'line-add';
                 } else if (kind === "del") {
                     color = 'line-del';
-                }
+                }*/
 
                 const highlight = document.createElement('div');
                 highlight.className = 'highlight ' + color;
-                highlight.style.left = `-8px`;
+                highlight.style.left = `0px`;
                 highlight.style.top = `${rect.top - container.getBoundingClientRect().top}px`;
-                highlight.style.width = `${container.getBoundingClientRect().width + 4}px`;
+                highlight.style.width = `${container.getBoundingClientRect().width - 6}px`;
                 highlight.style.height = `${rect.height}px`;
 
                 highlightContainer.appendChild(highlight);
@@ -196,7 +204,7 @@
         btnCompare.addEventListener("click", function () {
             const beforeText = textareaBefore.value;
             const afterText = textareaAfter.value;
-            const diffs = Diff.diffChars(beforeText, afterText);
+            const diffs = Diff.diffWords(beforeText, afterText, { intlSegmenter: segmenter });
             let elements = [];
             for (const diff of diffs) {
                 const value = escapeHTML(diff.value);
