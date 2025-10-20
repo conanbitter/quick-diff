@@ -48,12 +48,12 @@
         }
 
         .line-add {
-            background-color: rgb(200, 230, 201);
+            background-color: rgb(232, 245, 233);
             border-color: rgb(46, 125, 50);
         }
 
         .line-del {
-            background-color: rgb(255, 205, 210);
+            background-color: rgb(255, 235, 238);
             border-color: rgb(198, 40, 40);
         }
 
@@ -177,11 +177,11 @@
 
             for (const { rect, kind } of rectsByLine.values()) {
                 let color = 'line-mixed';
-                /*if (kind === "add") {
+                if (kind === "add") {
                     color = 'line-add';
                 } else if (kind === "del") {
                     color = 'line-del';
-                }*/
+                }
 
                 const highlight = document.createElement('div');
                 highlight.className = 'highlight ' + color;
